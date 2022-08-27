@@ -1,12 +1,14 @@
 from io import BytesIO
+import asyncio
 import os
 import typer
+import httpx
 import requests
-from datetime import datetime
+from datetime import datetime,date
 from PIL import Image
 
 from helpers import url_query_params,get_image,save_image_to_filesystem
-from config import API_URL,IMAGE_DIR
+from config import API_URL
 
 app= typer.Typer()
 
@@ -14,6 +16,16 @@ default_date = typer.Argument(
     datetime.now().strftime('%Y-%m-%d'),
 formats=['%Y-%m-%d']
 )
+
+async def get_images(urls):
+    async with httpx.AsyncClient() as client:
+        tasks = []
+        for url in urls:
+            tasks.append(
+                asyncio.create_task(get_image(client,url))
+            )
+        images= await asyncio.gather(*tasks)
+        return images
 
 
 @app.command()
@@ -36,18 +48,24 @@ def fetch_image(date:datetime = default_date,
 
     if isinstance(data,dict):
         data = [data]
+
+    urls= [d['url'] for d in data if d['media_type']== 'image']
+    titles = [d['title'] for d in data if d['media_type']== 'image']
     
     for resp in data:
-        url=resp['url']
-        title =resp['title']
+        if resp['media_type'] != 'image':
+            print(f"No image avaible for {resp['date']}")
+    
+    
+    images= asyncio.run( get_images(urls))
 
-        print("Fetching Image...")
-        image=get_image(url)
-
+    print(images)
+    
+    for i,image, in enumerate(images):
         image.show()
 
         if save:
-          save_image_to_filesystem(image, title)
+          save_image_to_filesystem(image, titles[i])
       
 
         image.close()
