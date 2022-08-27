@@ -1,2 +1,3 @@
 # typer_nasa_app
-https://res.cloudinary.com/practicaldev/image/fetch/s--axqrBQ-Q--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/aybb5cbbt6t489yrp7q7.png
+Typer Nasa API with CLI Project
+![nasa](https://user-images.githubusercontent.com/77650437/187036125-cc4eb9e8-8f12-4d1f-bcde-41298862c116.png)
